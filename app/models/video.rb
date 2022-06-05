@@ -5,24 +5,28 @@
 #  id          :integer          not null, primary key
 #  title       :string
 #  description :string
-#  visible     :boolean
-#  duration    :integer
+#  visible     :boolean          default(FALSE)
+#  duration    :integer          default(0)
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
+#  course_id   :integer          not null
 #
 class Video < ApplicationRecord
+
+    belongs_to :course
+    has_many :video_categories
+    has_many :comments, as: :commentable
+
+    has_many :categories, through: :video_categories, after_add: :new_category
+    
+    has_many :categorias_visibles, -> { where('categories.visible = ?', true ) }, through: :video_categories, source: :category
+    has_many :categorias_novisibles, -> { where('categories.visible = ?', false ) }, through: :video_categories, source: :category
 
     validates :title, presence: true
     validates :title, uniqueness: true
     validates :title, length: { maximum: 200, minimum: 2 }
     
     validate :validate_custome_title
-    validate :validate_custome_attr
-
-    before_create :send_mail, if: :has_description?
-    after_update :show_title
-
-    before_save :show_title
 
     scope :has_duration, -> { where('duration >= ?', 0) }
     scope :has_description, -> { where.not(description:nil) }
@@ -33,20 +37,10 @@ class Video < ApplicationRecord
         !description.nil? && !description.empty?
     end
 
-    def self.custome_join
-        where(description:nil)
-        .where(duration:0)
-        .order('id DESC')
-    end
-
     private
 
-    def send_mail
-        puts ">>>> Send Mail"
-    end
-
-    def show_title
-        puts ">>>> Nos encontramos en el método Show Title"
+    def new_category(category)
+        puts ">>> Se añadio al vídeo #{title} la category #{category.title}"
     end
 
     def validate_custome_title

@@ -1,16 +1,16 @@
 # == Schema Information
 #
-# Table name: courses
+# Table name: categories
 #
 #  id         :integer          not null, primary key
-#  title      :string           default("")
+#  title      :string
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
-#  state      :integer          default(0)
+#  visible    :boolean          default(TRUE)
 #
 require "test_helper"
 
-class CourseTest < ActiveSupport::TestCase
+class CategoryTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end
